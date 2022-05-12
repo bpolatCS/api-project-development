@@ -39,14 +39,38 @@ function App() {
       }
       let sortedWords = randomWordsFromApi.sort();
       setRandomWords(sortedWords);
-      //getMusics(sortedWords);
+      getMusics(sortedWords);
     }
+  };
+
+  const getMusics = async (words) => {
+    let result = [];
+    for (let i = 0; i < words.length; i++) {
+      let music = {};
+      const word = words[i];
+      music.randomWord = word;
+      let response = await fetch(
+        musicBrainzApiUrl + `?query=${word}&fmt=json`
+      ).then((res) => {
+        return res.json();
+      });
+      let recordings = response.recordings;
+      if (recordings.length > 0) {
+        //check the order
+        let sortedRecords = recordings.sort((a, b) => a.score - b.score);
+        music.recording = sortedRecords[sortedRecords.length - 1];
+      } else {
+        music.recording = null;
+      }
+      result.push(music);
+    }
+    setMusics(result);
   };
   
 
   return(
     <div className="container-fluid">
-        <div className="row">
+      <div className="row">
         <div className="col-6">
           <form onSubmit={onFormSubmit}>
             <div className="mb-3">
@@ -91,12 +115,42 @@ function App() {
           )}
         </div>
       </div>
+      {musics.length > 0 && (
+        <div className="row">
+          <div className="col-12">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Word</th>
+                  <th>Artist</th>
+                  <th>Title</th>
+                </tr>
+              </thead>
+              <tbody>
+                {musics.map((music) => {
+                  return (
+                    <tr>
+                      <td>{music.randomWord}</td>
+                      <td>
+                        {music.recording && music.recording["artist-credit"]
+                          ? music.recording["artist-credit"][0].name
+                          : "No recording found!"}
+                      </td>
+                      <td>
+                        {music.recording
+                          ? music.recording.title
+                          : "No recording found!"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
-
   );
-
-
-
 }
 
 export default App;
