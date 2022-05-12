@@ -6,7 +6,7 @@ import { randomWordApiUrl, musicBrainzApiUrl } from "./config";
 
 function App() {
 
-  const [numberOfWords, setNumberOfWords] = useState("");
+  const [numberOfWords, setNumberOfWords] = useState(""); //setting states for the later usage
   const [randomWords, setRandomWords] = useState([]);
   const [musics, setMusics] = useState([]);
  
@@ -25,19 +25,19 @@ function App() {
     let randomWordsFromApi = [];
     if (numberOfWords >= 5 && numberOfWords <= 20) {
       //reset random words and musics as an empty array
-      setRandomWords([]);
+      setRandomWords([]); //new generation needs delete whole songs and words
       setMusics([]);
-      while (randomWordsFromApi.length !== numberOfWords) {
+      while (randomWordsFromApi.length !== numberOfWords) { //taking words one by one until taking desired amount of word
         let response = await fetch(randomWordApiUrl).then((res) => {
           return res.json();
         });
         let word = response[0].word;
         //if does not exist the word in random words array
-        if (!randomWordsFromApi.includes(word)) {
+        if (!randomWordsFromApi.includes(word)) { //uniqueness check
           randomWordsFromApi.push(word);
         }
       }
-      let sortedWords = randomWordsFromApi.sort();
+      let sortedWords = randomWordsFromApi.sort(); //sorting words
       setRandomWords(sortedWords);
       getMusics(sortedWords);
     }
@@ -45,18 +45,18 @@ function App() {
 
   const getMusics = async (words) => {
     let result = [];
-    for (let i = 0; i < words.length; i++) {
+    for (let i = 0; i < words.length; i++) { //iteration number
       let music = {};
       const word = words[i];
       music.randomWord = word;
-      let response = await fetch(
+      let response = await fetch( //fetching api and getting songs 
         musicBrainzApiUrl + `?query=${word}&fmt=json`
       ).then((res) => {
         return res.json();
       });
       let recordings = response.recordings;
       if (recordings.length > 0) {
-        //check the order
+        //here, songs are sorted according to their scores. last indexed song has higher score value
         let sortedRecords = recordings.sort((a, b) => a.score - b.score);
         music.recording = sortedRecords[sortedRecords.length - 1];
       } else {
@@ -71,8 +71,8 @@ function App() {
   return(
     <div className="container-fluid">
       <div className="row">
-        <div className="col-6">
-          <form onSubmit={onFormSubmit}>
+        <div className="col-6"> 
+          <form onSubmit={onFormSubmit}> 
             <div className="mb-3">
               <label htmlFor="numberOfWords" className="form-label">
                 How many words do you want to generate?
@@ -103,7 +103,7 @@ function App() {
             <>
               <p>We have generated the following words for you</p>
               <ul className="list-group">
-                {randomWords.map((word) => {
+                {randomWords.map((word) => { //listing words
                   return (
                     <li key={word} className="list-group-item">
                       {word}
@@ -132,7 +132,7 @@ function App() {
                     <tr>
                       <td>{music.randomWord}</td>
                       <td>
-                        {music.recording && music.recording["artist-credit"]
+                        {music.recording && music.recording["artist-credit"] //validate if song is there or not
                           ? music.recording["artist-credit"][0].name
                           : "No recording found!"}
                       </td>
