@@ -7,6 +7,8 @@ import { randomWordApiUrl, musicBrainzApiUrl } from "./config";
 function App() {
 
   const [numberOfWords, setNumberOfWords] = useState("");
+  const [randomWords, setRandomWords] = useState([]);
+  const [musics, setMusics] = useState([]);
  
 
   const onNumberOfWordsInputChange = (e) => { //onchanged taking input
@@ -16,7 +18,29 @@ function App() {
 
   const onFormSubmit = async (e) => { //generating function 
     e.preventDefault();
-    //generateWords();
+    generateWords();
+  };
+
+  const generateWords = async () => {
+    let randomWordsFromApi = [];
+    if (numberOfWords >= 5 && numberOfWords <= 20) {
+      //reset random words and musics as an empty array
+      setRandomWords([]);
+      setMusics([]);
+      while (randomWordsFromApi.length !== numberOfWords) {
+        let response = await fetch(randomWordApiUrl).then((res) => {
+          return res.json();
+        });
+        let word = response[0].word;
+        //if does not exist the word in random words array
+        if (!randomWordsFromApi.includes(word)) {
+          randomWordsFromApi.push(word);
+        }
+      }
+      let sortedWords = randomWordsFromApi.sort();
+      setRandomWords(sortedWords);
+      //getMusics(sortedWords);
+    }
   };
   
 
@@ -44,13 +68,29 @@ function App() {
             <button
               type="submit"
               className="btn btn-primary"
-              disabled={numberOfWords <= 4 || numberOfWords > 20}
+              disabled={numberOfWords <= 4 || numberOfWords > 20} //validation
             >
               Generate
             </button>
           </form>
         </div>
+        <div className="col-6">
+          {randomWords.length > 0 && (
+            <>
+              <p>We have generated the following words for you</p>
+              <ul className="list-group">
+                {randomWords.map((word) => {
+                  return (
+                    <li key={word} className="list-group-item">
+                      {word}
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
+          )}
         </div>
+      </div>
     </div>
 
   );
