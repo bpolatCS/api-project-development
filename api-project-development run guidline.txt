@@ -1,0 +1,26 @@
+First of all it is a web app.
+
+Project done by ReactJS which is a library of JavaScript.
+
+In order to compile the code. You should first create a folder on your computer. 
+
+Open a poweshell here and type:
+git clone https://github.com/bpolatCS/api-app.git
+
+because it is a ReactJS project you should have installed node.js. You can find it from the following link:
+https://nodejs.org/en/
+
+after downloaded it you can simply go to the folder and open powershell and write: 
+npm install
+
+then:
+npm start
+
+(you may need to install bootstrap)
+
+here you are!
+enjoy the project
+
+
+
+ 
